@@ -10,8 +10,9 @@
 
 // ***** PIN ASSIGNMENTS *****
 
-const byte buzzerPin = 3;
-const byte systemLEDPin = A2;
+const byte buzzerPin = 6;
+const byte systemLEDPin = 4;
+int switchPin = A0;
 
 const byte EEPROM_ID = 2; //used to automatically trigger and eeprom reset after firmware update (if necessary)
 
@@ -29,8 +30,30 @@ byte *mMenu[] = {
   mMain, mDash, mConfig};
 
 byte curMenu=0, mIndex=0, mDrawIndex=0;
-LiquidCrystal lcd(A1, A0, 4, 7, 8, 9);
-AnalogButton button(A3, 0, 253, 454, 657);
+LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
+//AnalogButton button(A3, 0, 253, 454, 657);
+typedef	enum SWITCH
+{
+	SWITCH_NONE,
+	SWITCH_1,	
+	SWITCH_2
+}	switch_t;
+
+typedef enum DEBOUNCE_STATE
+{
+  DEBOUNCE_STATE_IDLE,
+  DEBOUNCE_STATE_CHECK,
+  DEBOUNCE_STATE_RELEASE
+} debounceState_t;
+// Switch debounce state machine state variable
+debounceState_t debounceState;
+// Switch debounce timer
+long lastDebounceTime;
+// Switch press status
+switch_t switchStatus;
+// Seconds timer
+int timerSeconds;
+
 
 unsigned long now, lcdTime, buttonTime,ioTime, serialTime;
 boolean sendInfo=true, sendDash=true, sendTune=true, sendInputConfig=true, sendOutputConfig=true;
@@ -116,8 +139,9 @@ void setup()
   lcd.setCursor(0,0);
   lcd.print(F(" osPID   "));
   lcd.setCursor(0,1);
-  lcd.print(F(" v1.60   "));
+  lcd.print(F(" Arduino "));
   delay(1000);
+  pinMode(switchPin, INPUT);
 
   initializeEEPROM();
 
@@ -142,7 +166,7 @@ void loop()
 {
   now = millis();
 
-  if(now >= buttonTime)
+/*  if(now >= buttonTime)
   {
     switch(button.get())
     {
@@ -166,7 +190,7 @@ void loop()
       break;
     }
     buttonTime += 50;
-  }
+  }*/
 
   bool doIO = now >= ioTime;
   //read in the input
@@ -243,7 +267,34 @@ void loop()
   }
 }
 
+void drawLCD()
+{
+     lcd.setCursor(0, 0);
+     // lcd.setCursor(0,row);
+      if(runningProfile)lcd.print(F("Running "));
+      else {
+        lcd.print("-");
+        lcd.print(profname);
+      }
+     lcd.setCursor(0, 1); 
+      // Print current temperature
+      lcd.print(input);
+      // Print degree Celsius symbol
+      lcd.print((char)223);
+      lcd.print("C ");
+  // If switch 1 is pressed
+  if (switchStatus == SWITCH_1)
+  {
+    // If currently reflow process is on going
+    if(runningProfile) StopProfile();
+    else StartProfile();
+    
+  } 
+}
 
+
+
+/*
 void drawLCD()
 {
   boolean highlightFirst= (mDrawIndex==mIndex);
@@ -597,7 +648,6 @@ void updown(bool up)
       {
       case 7:
         modeIndex= (modeIndex==0?1:0);
-        /*mode change code*/
         myPID.SetMode(modeIndex);
         break;
       case 11://12:
@@ -668,14 +718,14 @@ void ok()
       changeflag = false;
       break;
     case 2: 
-      changeAutoTune();/*autotune code*/
+      changeAutoTune();
       break;
     case 3: 
       if(runningProfile)StopProfile();
       else StartProfile();
 
       break;
-    case 5: /*nothing for input*/
+    case 5: 
       break;
     case 6: 
       if(modeIndex==0 && !tuning) editing=true; 
@@ -699,6 +749,7 @@ void ok()
     }
   }
 }
+*/
 
 void changeAutoTune()
 {
@@ -733,7 +784,6 @@ void AutoTuneHelper(boolean start)
     myPID.SetMode(modeIndex);
   } 
 }
-
 
 
 

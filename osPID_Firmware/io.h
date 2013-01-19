@@ -149,10 +149,10 @@ double ReadInputFromCard()
 #ifdef TEMP_INPUT_V120
 #include "MAX31855_local.h"
 const byte thermistorPin = A6;
-const byte thermocoupleCS = 10;
-const byte thermocoupleSO = 12;
-const byte thermocoupleCLK = 13;
-byte inputType = 0;
+const byte thermocoupleCS = A2;
+const byte thermocoupleSO = A3;
+const byte thermocoupleCLK = A1;
+byte inputType = 1;
 double THERMISTORNOMINAL = 10;
 double BCOEFFICIENT = 1;
 double TEMPERATURENOMINAL = 293.15;
@@ -336,9 +336,9 @@ double ReadInputFromCard()
 #endif /*PROTOTYPE_INPUT*/
 
 #if defined(DIGITAL_OUTPUT_V120) || defined(DIGITAL_OUTPUT_V150)
-byte outputType = 1;
-const byte RelayPin = 5;
-const byte SSRPin = 6;
+byte outputType = 2;
+const byte RelayPin = 4;
+const byte SSRPin = 5;
 //unsigned long windowStartTime;
 double outWindowSec = 5.0;
 unsigned long WindowSize = 5000;
