@@ -1,0 +1,15 @@
+RoHS	//first row is Profile Name
+3, 45, 0	// Start Temp
+2, 0, 0		
+1, 140, 70	// Ramp to Preheat (Flux Activation)
+1, 180, 100	// PreHeat Phase
+1, 220, 45	// Solder Reflow
+1, 245, 25	// Reflow Max
+127, 0, 1	// Beep
+3, 210, 0	// Reflow Cooling 
+2, 0, 0		// Complete
+127, 0, .5	// Short Beep
+3, 50, 0	// Safe Temp
+2, 0, 0		// Complete
+127, 0, 2	// Long Beep
+3, 0, 0		// Shutdown
